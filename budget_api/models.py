@@ -7,6 +7,7 @@ class Expense(models.Model):
     title = models.CharField(max_length=255)
     value = models.DecimalField(max_digits=9, decimal_places=2)
     category = models.ForeignKey("IncomeAndExpenseCategory", on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.title} {self.value}"
@@ -15,7 +16,8 @@ class Income(models.Model):
     title = models.CharField(max_length=255)
     value = models.DecimalField(max_digits=9, decimal_places=2)
     category = models.ForeignKey("IncomeAndExpenseCategory", on_delete=models.CASCADE)
-
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    
     def __str__(self):
         return f"{self.title} {self.value}"
 
