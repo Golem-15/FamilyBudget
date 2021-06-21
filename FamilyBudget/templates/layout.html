@@ -1,9 +1,81 @@
+{% load static %}
+{% url 'render-budget-list' as render_budget_list %}
+{% url 'render-user-list' as render_user_list %}
+{% url 'render-create-budget' as render_create_budget %}
 <!DOCTYPE html>
 <html>
-    <head></head>
+    <head>
+        <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/datatables.min.css' %}"/>
+        <script type="text/javascript" src="{% static 'js/datatables.min.js' %}"></script>
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
+        <link rel="icon" href="{% static 'img/favicon.ico' %}">
+        <style>
+            .navbar-controls {
+                margin-right: 2vw;
+            }
+            .user-data-label, .update-user-form label {
+                margin: auto;
+                min-width: 10vw;
+            }
+            .list-group-border {
+                padding: .25rem .25rem;
+                min-height: 25vh;
+                max-height: 50vh;
+                border: 1px solid rgba(0,0,0,.125);
+            }
+            .list-group-placeholder {
+                padding: .5rem 1rem;
+            }
+        </style>
+    </head>
     <body>
-        <h4>This is always here</h4>
-        {% block content %}
-        {% endblock %}
+        <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+            <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{% url 'homepage' %}">FamilyBudget</a>
+            <ul class="navbar-nav px-3 flex-row">
+                <li class="nav-item text-nowrap navbar-controls">
+                    <a class="nav-link" href="{% url 'my-account' %}">User Account</a>
+                </li>
+                <li class="nav-item text-nowrap navbar-controls">
+                    <a class="nav-link" href="{% url 'logout' %}">Sign out</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="container-fluid">
+            <div class="row">
+                <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.get_full_path == render_budget_list %}active{% else %}{% endif %}" href="{% url 'render-budget-list' %}">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        Budget List<span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.get_full_path == render_create_budget %}active{% else %}{% endif %}" href="{% url 'render-create-budget' %}">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-fil"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="11 12 11 18"></polyline><polyline points="8 15 14 15"></polyline><polyline points="13 2 13 9 20 9"></polyline></svg>
+                        Create new budget
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.get_full_path == render_user_list %}active{% else %}{% endif %}" href="{% url 'render-user-list' %}">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        Family Members
+                        </a>
+                    </li>
+                    </ul>
+                </div>
+                </nav>
+                <div class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" id="page-content">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/feather.min.js' %}"></script>
     </body>
 </html>

@@ -13,6 +13,8 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(template_name='auth/logged_out.html', next_page=None), name='logout'),
     path('home/', ProjectViews.Homepage.as_view(), name='homepage'),
     path('user/create/', ProjectViews.UserCreateView.as_view(), name='user-create'),
+    path('my_account/', ProjectViews.MyAccount.as_view(), name='my-account'),
+    path('user/details/<int:pk>/', ProjectViews.UserDetails.as_view(), name='user-details'),
     path('user/delete/<int:pk>/', ProjectViews.UserDeleteView.as_view(), name="user-delete"),
     path('user/update/<int:pk>/', ProjectViews.UserUpadteView.as_view(), name="user-update"),
     path('user_created/', ProjectViews.UserCreated.as_view(), name='user-created'),

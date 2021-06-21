@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h5>Your Account</h5><button class="btn btn-secondary" onclick="window.location.href='{{ user_update_url }}'">Edit data</button>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group form-inline">                            
+                <label class="user-data-label">Username</label>
+                <input disabled type="email" class="form-control" id="userName" value="{{ user_data.username }}">
+            </div>
+            <div class="form-group form-inline">                            
+                <label  class="user-data-label">First Name</label>
+                <input disabled type="email" class="form-control" id="firstName" value="{{ user_data.first_name }}">
+            </div>
+            <div class="form-group form-inline">                            
+                <label  class="user-data-label">Last Name</label>
+                <input disabled type="email" class="form-control" id="lastName" value="{{ user_data.last_name }}">
+            </div>
+            <div class="form-group form-inline">                            
+                <label  class="user-data-label">Email Address</label>
+                <input disabled type="email" class="form-control" id="emailAddress" value="{{ user_data.email }}">
+            </div>        
+        </div>
+    </div>    
+
+{% endblock %}

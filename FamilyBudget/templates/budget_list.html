@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h4>Budget List</h4>
+    <!-- <button onclick="window.location.href='{% url 'user-create' %}'">Add Family Member</button> -->
+
+    <table id="budgetsTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Owner</th>
+                <th>Balance</th>
+                <th></th>
+            </tr>
+        </thead>
+    </table>
+    
+    <script>
+
+        function createTable(data) {
+
+        $('#budgetsTable thead tr').clone(true).appendTo( '#budgetsTable thead' );
+        $('#budgetsTable thead tr:eq(1) th').each( function (i) {
+            
+            if (i < 5) {
+                var title = $(this).text();
+                if (i < 4) {
+                    $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+                } 
+            
+                $( 'input', this ).on( 'keyup change', function () {
+                    if ( table.column(i).search() !== this.value ) {
+                        table
+                            .column(i)
+                            .search( this.value )
+                            .draw();
+                    }
+                } );
+            }
+        } );
+
+        let table = $('#budgetsTable').DataTable({
+            data: data,
+            orderCellsTop: true,
+            fixedHeader: true,
+            columnDefs: [
+                {
+                "targets": -1,
+                "data": 5,
+                "defaultContent": "<button class='budget-edit-button'>Edit</button>"
+                }
+            ]
+        });
+
+        }
+
+        // define keyups for instant filtering
+        // $('#minDelay, #maxDelay, #minChance, #maxChance').keyup( function() {
+        //     table.draw();
+        // } );
+    </script>
+    <script>
+        async function getAllUsers() {
+            fetch('{% url "budget-list" %}')
+            .then(response => response.json())
+            .then(data => {
+                let parsed_data = data.map(x => Object.values(x))
+                createTable(parsed_data)
+            });
+        }
+    </script>
+    <script>
+        $('document').ready(getAllUsers)
+    </script>
+    
+{% endblock %}

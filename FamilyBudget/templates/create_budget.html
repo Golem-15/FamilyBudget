@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h4>Create Budget</h4>
+    <form>
+        <div class="form-group">                            
+            <label>Name</label>
+            <input type="text" class="form-control" id="budgetName" style="width: 40%;" placeholder="Type in budget name...">
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group choice-event-items">
+                    <label>Incomes</label>
+                    <div class="list-group-border">
+                        <p class="list-group-placeholder">No incomes yet</p>
+                        <ul id="budgetExpenses" class="list-group">
+                        </ul>    
+                    </div>
+                    <div>
+                        <button type="button" id="addOptionButton" class="btn btn-secondary">Add income</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group choice-event-items">
+                    <label>Expenses</label>
+                    <div class="list-group-border">
+                        <p class="list-group-placeholder">No incomes yet</p>
+                        <ul id="budgetExpenses" class="list-group">
+                        </ul>    
+                    </div>
+                    <div>
+                        <button type="button" id="addOptionButton" class="btn btn-secondary">Add expense</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}

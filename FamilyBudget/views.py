@@ -48,7 +48,7 @@ class UserCreateView(CreateView):
     form_class = UserForm
 
     def get_success_url(self):
-        return reverse_lazy('user-created')
+        return reverse_lazy('render-user-list')
 
 
 @method_decorator(login_required(login_url='login'), name='dispatch')
@@ -63,7 +63,7 @@ class UserUpadteView(UpdateView):
         return super(UserUpadteView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('user-updated')
+        return reverse_lazy('my-account')
 
 
 @method_decorator(login_required(login_url='login'), name='dispatch')
@@ -71,9 +71,10 @@ class UserDeleteView(DeleteView):
     model = User
 
     def get_success_url(self):
-        return reverse_lazy('user-deleted')
+        return reverse_lazy('render-user-list')
 
 
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class UserList(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = serializers.UserSerializer
@@ -96,3 +97,16 @@ class UserUpdated(View):
 class UserDeleted(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'user_deleted.html')
+
+@method_decorator(login_required(login_url='login'), name='dispatch')
+class UserDetails(View):
+    def get(self, request, pk, *args, **kwargs):
+        user_data = serializers.UserSerializer(User.objects.get(id=pk)).data
+        return render(request, 'user_details.html', context={'user_data': user_data})
+
+@method_decorator(login_required(login_url='login'), name='dispatch')
+class MyAccount(View):
+    def get(self, request, *args, **kwargs):
+        user_data = serializers.UserSerializer(User.objects.get(id=self.request.user.id)).data
+        user_update_url = reverse_lazy('user-update', kwargs={'pk': self.request.user.id})
+        return render(request, 'user_details.html', context={'user_data': user_data, 'user_update_url': user_update_url})

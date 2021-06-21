@@ -84,15 +84,16 @@
 </head>
 
 <div class="sidenav bg-dark">
-    <div class="login-main-text">
-        <h2>FamilyBudget</h2>
-        <p>Thanks for using the dashboard!</p>
-        </div>
-    </div>
-    <div class="main">
-        <div class="col-md-6 col-sm-12">
-        <div class="login-form">
-            <div>Click <a href="{% url 'login' %}">here</a> to go back to the login page</div>
-        </div>
-    </div>
-</div>
+         <div class="login-main-text">
+            <h2>FamilyBudget</h2>
+            <p>Login to access the dashboard.</p>
+         </div>
+      </div>
+      <div class="main">
+         <div class="col-md-6 col-sm-12">
+            <div class="login-form">
+                {% block content %}
+                {% endblock %}
+            </div>
+         </div>
+      </div>

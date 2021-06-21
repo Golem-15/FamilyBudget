@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h4>Family Members</h4><button onclick="window.location.href='{% url 'user-create' %}'">Add Family Member</button>
+
+    <table id="usersTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <!-- <th></th> -->
+            </tr>
+        </thead>
+    </table>
+    
+    <script>
+
+        function createTable(data) {
+
+        $('#usersTable thead tr').clone(true).appendTo( '#usersTable thead' );
+        $('#usersTable thead tr:eq(1) th').each( function (i) {
+            
+            if (i < 5) {
+                var title = $(this).text();
+                if (i < 6) {
+                    $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+                } 
+            
+                $( 'input', this ).on( 'keyup change', function () {
+                    if ( table.column(i).search() !== this.value ) {
+                        table
+                            .column(i)
+                            .search( this.value )
+                            .draw();
+                    }
+                } );
+            }
+        } );
+
+        let table = $('#usersTable').DataTable({
+            data: data,
+            orderCellsTop: true,
+            fixedHeader: true,
+            columnDefs: [
+                // {
+                // "targets": -1,
+                // "data": 6,
+                // "defaultContent": "<button class='deleteButton'>Details</button>"
+                // }
+            ]
+        });
+
+        }
+
+        // define keyups for instant filtering
+        // $('#minDelay, #maxDelay, #minChance, #maxChance').keyup( function() {
+        //     table.draw();
+        // } );
+    </script>
+    <script>
+        async function getAllUsers() {
+            fetch('{% url "get-user-list" %}')
+            .then(response => response.json())
+            .then(data => {
+                let parsed_data = data.map(x => Object.values(x))
+                createTable(parsed_data)
+            });
+        }
+    </script>
+    <script>
+        $('document').ready(getAllUsers)
+    </script>
+    
+{% endblock %}
