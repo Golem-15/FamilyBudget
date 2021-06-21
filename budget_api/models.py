@@ -50,6 +50,7 @@ class Budget(models.Model):
     expenses = models.ManyToManyField("Expense", blank=True)
     owner = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
     shared_with = models.ManyToManyField(User, blank=True, related_name='budgets', through='SharedBudget')
+    balance = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.name}"

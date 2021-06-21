@@ -1,13 +1,24 @@
 from rest_framework import serializers
 from rest_framework.relations import StringRelatedField
 from budget_api import models
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
+
+class UserBudgetListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ["id", "username"]
 
 class BudgetListSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField()
+    shared_with = UserBudgetListSerializer(many=True)
     
     class Meta:
         model = models.Budget
-        fields = ["id", "name", "owner"]
+        fields = ["id", "name", "owner", "balance", "shared_with"]
 
 class IncomeAndExpenseSerializer(serializers.ModelSerializer):
     category = StringRelatedField()
@@ -35,4 +46,4 @@ class BudgetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Budget
-        fields = "__all__"
+        fields = ["name", "incomes", "expenses", "shared_with"]

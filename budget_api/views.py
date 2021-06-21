@@ -2,6 +2,7 @@ from django.http.response import HttpResponse, JsonResponse
 from django.views.generic.list import ListView
 from django.views import View
 from django.db.models import Q
+from django.shortcuts import render
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.views import APIView
@@ -35,7 +36,8 @@ class CreateBudget(generics.CreateAPIView):
     serializer_class = serializers.BudgetSerializer
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        balance = sum(float(x.value) for x in serializer.validated_data['incomes']) - sum(float(x.value) for x in serializer.validated_data['expenses'])
+        serializer.save(owner=self.request.user, balance=balance)
     
 class UpdateBudget(generics.UpdateAPIView):
     permission_classes = (IsAuthenticated,)
@@ -95,3 +97,16 @@ class ListIncomes(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = models.Income.objects.all()
     serializer_class = serializers.IncomeAndExpenseCreationSerializer
+
+
+class RenderBudgetList(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'budget_list.html')
+
+class RenderUserList(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'user_list.html')
+
+class RenderCreateBudget(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'create_budget.html')
