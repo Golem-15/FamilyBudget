@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Expense(models.Model):
+    id = models.UUIDField(primary_key=True)
     title = models.CharField(max_length=255)
     value = models.DecimalField(max_digits=9, decimal_places=2)
     category = models.ForeignKey("IncomeAndExpenseCategory", on_delete=models.CASCADE)
@@ -13,6 +14,7 @@ class Expense(models.Model):
         return f"{self.title} {self.value}"
 
 class Income(models.Model):
+    id = models.UUIDField(primary_key=True)
     title = models.CharField(max_length=255)
     value = models.DecimalField(max_digits=9, decimal_places=2)
     category = models.ForeignKey("IncomeAndExpenseCategory", on_delete=models.CASCADE)
@@ -48,8 +50,8 @@ class Budget(models.Model):
     name = models.CharField(max_length=255)
     incomes = models.ManyToManyField("Income", blank=True)
     expenses = models.ManyToManyField("Expense", blank=True)
-    owner = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
-    shared_with = models.ManyToManyField(User, blank=True, related_name='budgets', through='SharedBudget')
+    owner = models.ForeignKey(User, null=False, related_name='owner', on_delete=models.CASCADE)
+    shared_with = models.ManyToManyField(User, blank=True, related_name='shared_with')
     balance = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
