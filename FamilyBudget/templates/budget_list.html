@@ -1,8 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
     <h4>Budget List</h4>
-    <!-- <button onclick="window.location.href='{% url 'user-create' %}'">Add Family Member</button> -->
-
+    
     <table id="budgetsTable" class="display" style="width:100%">
         <thead>
             <tr>
@@ -43,11 +42,12 @@
             data: data,
             orderCellsTop: true,
             fixedHeader: true,
+            order: [[ 0, "desc" ]],
             columnDefs: [
                 {
                 "targets": -1,
                 "data": 5,
-                "defaultContent": "<button class='budget-edit-button'>Edit</button>"
+                "defaultContent": "<button class='budget-details-button'>Details</button>"
                 }
             ]
         });
@@ -60,17 +60,23 @@
         // } );
     </script>
     <script>
-        async function getAllUsers() {
+        async function getAllBudgets() {
             fetch('{% url "budget-list" %}')
             .then(response => response.json())
             .then(data => {
                 let parsed_data = data.map(x => Object.values(x))
                 createTable(parsed_data)
+                    document.querySelectorAll('.budget-details-button').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                            let budgetId = e.target.parentElement.parentElement.querySelector('td').innerHTML;
+                            window.location.href = `/budget_app/budget_details/${budgetId}`;
+                        });
+                    })
             });
         }
     </script>
     <script>
-        $('document').ready(getAllUsers)
+        $('document').ready(getAllBudgets)
     </script>
     
 {% endblock %}

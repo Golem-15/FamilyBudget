@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <h4>Family Members</h4><button onclick="window.location.href='{% url 'user-create' %}'">Add Family Member</button>
+    <h4 style="display: inline;">Family Members</h4><button style="display: inline-block; font-size: .75rem; margin: 0 4vw;" class="btn btn-secondary" onclick="window.location.href='{% url 'user-create' %}'">Add Family Member</button>
 
     <table id="usersTable" class="display" style="width:100%">
         <thead>
