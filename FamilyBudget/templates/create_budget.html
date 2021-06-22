@@ -131,7 +131,7 @@
                 <div class="form-group choice-event-items">
                     <label>Incomes</label>
                     <div class="list-group-border">
-                        <ul id="budgetIncomes" class="list-group">
+                        <ul required id="budgetIncomes" class="list-group">
                         </ul>    
                     </div>
                     <div>
@@ -145,7 +145,7 @@
                 <div class="form-group choice-event-items">
                     <label>Expenses</label>
                     <div class="list-group-border">
-                        <ul id="budgetExpenses" class="list-group">
+                        <ul required id="budgetExpenses" class="list-group">
                         </ul>    
                     </div>
                     <div>
@@ -275,12 +275,14 @@
 
 
         $('#submitBudget')[0].addEventListener('click', () => {
-            let sharedWith = Array.from($('#shareBudgetWith')[0].querySelectorAll('option:checked')).map(x => Number(x.value))
-            let incomes = Array.from($('#budgetIncomes')[0].querySelectorAll('li')).map(x => JSON.parse(x.getAttribute('post-data')))
-            let expenses = Array.from($('#budgetExpenses')[0].querySelectorAll('li')).map(x => JSON.parse(x.getAttribute('post-data')))
-            let budgetName = $('#budgetName')[0].value
-            post_data = {'sharedWith': sharedWith, 'incomes': incomes, 'expenses': expenses, 'name': budgetName}
-            create_budget(post_data)
+            if ($('#budgetName')[0].checkValidity()) {
+                let sharedWith = Array.from($('#shareBudgetWith')[0].querySelectorAll('option:checked')).map(x => Number(x.value))
+                let incomes = Array.from($('#budgetIncomes')[0].querySelectorAll('li')).map(x => JSON.parse(x.getAttribute('post-data')))
+                let expenses = Array.from($('#budgetExpenses')[0].querySelectorAll('li')).map(x => JSON.parse(x.getAttribute('post-data')))
+                let budgetName = $('#budgetName')[0].value
+                post_data = {'sharedWith': sharedWith, 'incomes': incomes, 'expenses': expenses, 'name': budgetName}
+                create_budget(post_data)
+            }
         })
     </script>
 {% endblock %}
