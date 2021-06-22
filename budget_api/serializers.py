@@ -6,6 +6,12 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+class IncomeAndExpenseCategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.IncomeAndExpenseCategory
+        fields = "__all__"
+
 class UserBudgetListSerializer(serializers.ModelSerializer):
 
     class Meta:

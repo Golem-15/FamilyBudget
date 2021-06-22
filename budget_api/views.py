@@ -1,13 +1,16 @@
-from django.http.response import HttpResponse, JsonResponse
+from django.http.response import HttpResponse, JsonResponse, Http404
 from django.views.generic.list import ListView
 from django.views import View
 from django.db.models import Q
+from django.db import transaction
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.fields import CurrentUserDefault
+import json
+from uuid import uuid4
 
 import budget_api.models as models
 import budget_api.serializers as serializers
@@ -98,6 +101,25 @@ class ListIncomes(generics.ListAPIView):
     queryset = models.Income.objects.all()
     serializer_class = serializers.IncomeAndExpenseCreationSerializer
 
+class IncomeAndExpenseCategories(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = models.IncomeAndExpenseCategory.objects.all()
+    serializer_class = serializers.IncomeAndExpenseCategorySerializer
+
+class IncomeList(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.IncomeAndExpenseSerializer
+
+    def get_queryset(self):
+        return models.Income.objects.filter(budget__id=self.kwargs.get('pk'))
+
+class ExpenseList(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.IncomeAndExpenseSerializer
+
+    def get_queryset(self):
+        return models.Expense.objects.filter(budget__id=self.kwargs.get('pk'))
+
 
 class RenderBudgetList(View):
     def get(self, request, *args, **kwargs):
@@ -110,3 +132,35 @@ class RenderUserList(View):
 class RenderCreateBudget(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'create_budget.html')
+
+class RenderBudgetDetails(View):
+    def get(self, request, pk, *args, **kwargs):
+        budget = models.Budget.objects.filter(id=pk).filter(Q(owner=request.user) | Q(shared_with__in=[request.user]))
+
+        if budget:
+            incomes = serializers.IncomeAndExpenseSerializer(models.Income.objects.filter(budget__id=self.kwargs.get('pk')), many=True).data
+            expenses = serializers.IncomeAndExpenseSerializer(models.Expense.objects.filter(budget__id=self.kwargs.get('pk')), many=True).data
+            incomes = [{key:value if key != 'value' else float(value) for key,value in income.items()} for income in incomes]
+            expenses = [{key:value if key != 'value' else -float(value) for key,value in expense.items()} for expense in expenses]
+            return render(request, 'budget_details.html', context={'incomes': json.dumps(incomes), 'expenses': json.dumps(expenses)})
+        else:
+            raise Http404()
+
+@transaction.atomic
+def UploadBudget(request):
+    data = json.loads(request.body)
+    balance = sum([float(x['value']) for x in data['incomes']]) - sum([float(x['value']) for x in data['expenses']])
+    new_budget = models.Budget.objects.create(name=data['name'], owner=request.user, balance=balance)
+    for income in data['incomes']:
+        new_income = models.Income.objects.create(id=str(uuid4()), title=income['title'], value=income['value'], category=models.IncomeAndExpenseCategory.objects.get(id=income['category']), owner=request.user)
+        new_budget.incomes.add(new_income)
+    for expense in data['expenses']:
+        new_expense = models.Expense.objects.create(id=str(uuid4()), title=expense['title'], value=expense['value'], category=models.IncomeAndExpenseCategory.objects.get(id=expense['category']), owner=request.user)
+        new_budget.expenses.add(new_expense)
+    for user in data['sharedWith']:
+        new_budget.shared_with.add(user)
+    # models.Budget.objects.create(name=data['budgetName'])    
+    # for expense in data['incomes']:
+    #     models.Income.objects.create(title=income['title'], value=income['value'], category=income['category'])
+    one = 1
+    return HttpResponse('Budget created successfully', status=200)
