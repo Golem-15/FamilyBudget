@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h4>Budget Details</h4>
+    <div class="form-group">
+        <label>Budget name</label>
+        <input disabled class="form-group">
+    </div>
+    <table id="incomeAndExpenseTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Category</th>
+                <th>Title</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+    </table>
+    
+    <script>
+
+        function createTable(data) {
+
+        $('#incomeAndExpenseTable thead tr').clone(true).appendTo( '#incomeAndExpenseTable thead' );
+        $('#incomeAndExpenseTable thead tr:eq(1) th').each( function (i) {
+            
+            if (i < 7) {
+                var title = $(this).text();
+                if (i < 6) {
+                    $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+                } 
+            
+                $( 'input', this ).on( 'keyup change', function () {
+                    if ( table.column(i).search() !== this.value ) {
+                        table
+                            .column(i)
+                            .search( this.value )
+                            .draw();
+                    }
+                } );
+            }
+        } );
+
+        let table = $('#incomeAndExpenseTable').DataTable({
+            data: data,
+            orderCellsTop: true,
+            fixedHeader: true,
+            columnDefs: [
+                // {
+                // "targets": -1,
+                // "data": 5,
+                // "defaultContent": "<button class='budget-details-button'>Details</button>"
+                // }
+            ]
+        });
+
+        }
+
+        const incomes = {{ incomes | safe }}
+        const expenses = {{ expenses | safe }}
+        data = incomes.concat(expenses)
+        data = data.map(x => x)
+        let parsed_data = data.map(x => Object.values(x))
+        createTable(parsed_data)
+
+        // define keyups for instant filtering
+        // $('#minDelay, #maxDelay, #minChance, #maxChance').keyup( function() {
+        //     table.draw();
+        // } );
+    </script>
+    <script>
+        // $('document').ready(getAllBudgets)
+    </script>
+    
+{% endblock %}
