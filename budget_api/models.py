@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from uuid import uuid4
 
 User = get_user_model()
 
 class Expense(models.Model):
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid4)
     title = models.CharField(max_length=255)
     value = models.DecimalField(max_digits=9, decimal_places=2)
     category = models.ForeignKey("IncomeAndExpenseCategory", on_delete=models.CASCADE)
@@ -14,7 +15,7 @@ class Expense(models.Model):
         return f"{self.title} {self.value}"
 
 class Income(models.Model):
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid4)
     title = models.CharField(max_length=255)
     value = models.DecimalField(max_digits=9, decimal_places=2)
     category = models.ForeignKey("IncomeAndExpenseCategory", on_delete=models.CASCADE)
