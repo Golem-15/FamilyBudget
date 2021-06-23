@@ -24,8 +24,9 @@ to imitate the behaviour of a Django + React configuration, where Django serves 
 </ul>
 <br>
 <h3>Things that are not there or could be improved</h3>
-<p style="font-size=.5rem;">Due to time constraints I was not able to implement all features, that I intended to.</p>
+<p>Due to time constraints I was not able to implement all features, that I intended to.</p>
 <ul>
   <li>Updating / editing budgets is not possible yet</li>
   <li>Testing is very limited (only main functionalities)</li>
+  <li>Pagination and filtering is done on the client's side, which should not be a problem for a simple app like this, with a limited number of results, however it chould be moved to the backend for a performance boost if needed</li>
 </ul>
