@@ -32,14 +32,14 @@ class AppTests(TestCase):
         self.test_budget_2 = Budget.objects.create(name='testBudget', balance=0, owner=self.user_3)
         self.test_budget_2.shared_with.add(self.user_1)
 
-    def test_budget_creation(self):
+    def test_simplest_budget_creation(self):
         self.client.login(username=self.username_1, password='123')
-        data = {"sharedWith":[],"incomes":[],"expenses":[],"name":"ASD"}
-        response = self.client.post(reverse('budget-create'), data)
+        # data = {"sharedWith":[],"incomes":[],"expenses":[],"name":"ASD"}
+        data = {"sharedWith":[2],"incomes":[{"title":"Work","value":"100","category":"1"}],"expenses":[{"title":"Food","value":"100","category":"2"}],"name":"SASD"}
+        response = self.client.post(reverse('budget-create'), data, content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(Budget.objects.get(name=data['name']))
 
-    
     def test_if_not_authenticated_user_cannot_access_pages(self):
         urls = [
             '/admin/', '/home/', '/get/user_list/', '/my_account/', '/budget_app/', '/api/', '/budget_list/', '/create_budget/', '/user_list/', '/budget_details/1/', '/budget/list/', '/budget/details/1/', '/budget/create/', '/budget/update/1/', '/budget/delete/1/', '/income_and_expense_categories/', '/expense/create/', '/expense/update/1/', '/income/create/', '/income/update/1/', '/budget_income_list/1/', '/budget_expense_list/1/', '/upload_budget/'

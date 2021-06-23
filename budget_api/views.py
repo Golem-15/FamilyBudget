@@ -151,7 +151,7 @@ class RenderBudgetDetails(View):
             raise Http404()
 
 @transaction.atomic
-def UploadBudget(request):
+def CreateBudget(request):
     data = json.loads(request.body)
     balance = sum([float(x['value']) for x in data['incomes']]) - sum([float(x['value']) for x in data['expenses']])
     new_budget = models.Budget.objects.create(name=data['name'], owner=request.user, balance=balance)
@@ -167,4 +167,4 @@ def UploadBudget(request):
     # for expense in data['incomes']:
     #     models.Income.objects.create(title=income['title'], value=income['value'], category=income['category'])
     one = 1
-    return HttpResponse('Budget created successfully', status=200)
+    return HttpResponse('Budget created successfully', status=201)

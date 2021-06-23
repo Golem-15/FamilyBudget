@@ -257,7 +257,7 @@
     <script>
         async function create_budget(post_data) {
 
-                let reponse = await fetch("{% url 'upload-budget' %}", {
+                let reponse = await fetch("{% url 'budget-create' %}", {
                     method: 'POST',
                     mode: 'cors',
                     headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRFToken': $('input[name=csrfmiddlewaretoken]')[0].value},
