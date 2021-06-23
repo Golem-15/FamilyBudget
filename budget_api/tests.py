@@ -15,35 +15,22 @@ User = get_user_model()
 
 
 class AppTests(TestCase):
+    fixtures = ["budget_api_fixture.json"]
+
     def setUp(self):
         self.username_1 = fake.user_name()
         self.username_2 = fake.user_name()
+        self.username_3 = fake.user_name()
         self.user_1 = User.objects.create_user(username=self.username_1, first_name=fake.first_name(), last_name=fake.last_name(), email=fake.email())
         self.user_2 = User.objects.create_user(username=self.username_2, first_name=fake.first_name(), last_name=fake.last_name(), email=fake.email())
+        self.user_3 = User.objects.create_user(username=self.username_3, first_name=fake.first_name(), last_name=fake.last_name(), email=fake.email())
         self.user_1.set_password('123')
         self.user_1.save()
         self.user_2.set_password('456')
         self.user_2.save()
-        self.test_budget = Budget.objects.create(name='testBudget', balance=0, owner=self.user_1)
-
-
-    def test_if_users_can_be_created_via_post(self):
-        user_1 = User.objects.get(username=self.username_1)
-        user_2 = User.objects.get(username=self.username_2)
-        self.assertIsNotNone(user_1)
-        self.assertIsNotNone(user_2)
-        self.client.login(username=self.username_1, password='123')
-        data = {
-            'confirm_password': 'asd',
-            'email': 'asd@asd',
-            'first_name': 'asd',
-            'last_name': 'asd',
-            'password': 'asd',
-            'username': 'ASD'
-        }
-        response = self.client.post(reverse('user-create'), data, content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        self.test_budget_1 = Budget.objects.create(name='testBudget', balance=0, owner=self.user_1)
+        self.test_budget_2 = Budget.objects.create(name='testBudget', balance=0, owner=self.user_3)
+        self.test_budget_2.shared_with.add(self.user_1)
 
     def test_budget_creation(self):
         self.client.login(username=self.username_1, password='123')
@@ -63,12 +50,12 @@ class AppTests(TestCase):
         
     def test_user_cannot_see_not_shared_budget_details(self):
         self.client.login(username=self.username_2, password='456')
-        response = self.client.get(reverse('budget-details', kwargs={'pk': self.test_budget.id}))
+        response = self.client.get(reverse('budget-details', kwargs={'pk': self.test_budget_1.id}))
         self.assertEqual(json.loads(response.content), {})
 
     def test_user_can_see_own_budget_details(self):
         self.client.login(username=self.username_1, password='123')
-        response = self.client.get(reverse('budget-details', kwargs={'pk': self.test_budget.id}))
+        response = self.client.get(reverse('budget-details', kwargs={'pk': self.test_budget_1.id}))
         self.assertEqual(json.loads(response.content), {
             'balance': 0,
             'expenses': [],
@@ -80,9 +67,9 @@ class AppTests(TestCase):
             })
 
     def test_user_can_see_shared_budget_details(self):
-        self.test_budget.shared_with.add(self.user_2)
+        self.test_budget_1.shared_with.add(self.user_2)
         self.client.login(username=self.username_2, password='456')
-        response = self.client.get(reverse('budget-details', kwargs={'pk': self.test_budget.id}))
+        response = self.client.get(reverse('budget-details', kwargs={'pk': self.test_budget_1.id}))
         self.assertEqual(json.loads(response.content), {
             'balance': 0,
             'expenses': [],
@@ -92,3 +79,13 @@ class AppTests(TestCase):
             'owner': self.username_1,
             'shared_with': [self.user_2.id]
             })
+
+    def test_user_can_see_only_their_or_shared_budgets_in_api_list(self):
+        self.client.login(username=self.username_1, password='123')
+        response = self.client.get(reverse('budget-list'))
+        self.assertEqual([x['id'] for x in json.loads(response.content)], [1,2])
+        
+    def test_user_can_see_nothing_if_nothing_is_owned_or_shared_with_them(self):
+        self.client.login(username=self.username_2, password='456')
+        response = self.client.get(reverse('budget-list'))
+        self.assertEqual([x['id'] for x in json.loads(response.content)], [])
