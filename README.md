@@ -9,6 +9,7 @@ An app for managing the family budget
   <li>Run "pip install -r requirements.txt" (preferably in a virtual env)</li>
   <li>Run a file called "run_locally.bat"</li>
   <li>Log in as "FamilySpirit" with the password "123"</li>
+  <li>Optionall log in as other family members to see some budgets, their passwords are always "123"</li>
 </ol>
 <p>Since I was not using a framework like React I decided to render JS partially with Django Templates and then pull data from REST frameworks with simple JS fetches
 to imitate the behaviour of a Django + React configuration, where Django serves mostly for serving JSON data and validating JWTs etc.</p>
