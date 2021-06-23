@@ -27,11 +27,15 @@ class BudgetDetails(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
-        response_data = serializers.BudgetDetailSerializer(
-            models.Budget.objects.get(id=pk)
-        ).data
-        response_data['balance'] = sum([float(x['value']) for x in response_data['incomes']]) - sum([float(x['value']) for x in response_data['expenses']])
-        return JsonResponse(response_data)
+        budget = models.Budget.objects.filter(id=pk).filter(Q(owner=request.user) | Q(shared_with__in=[request.user]))
+        if budget:
+            response_data = serializers.BudgetDetailSerializer(
+                models.Budget.objects.get(id=pk)
+            ).data
+            response_data['balance'] = sum([float(x['value']) for x in response_data['incomes']]) - sum([float(x['value']) for x in response_data['expenses']])
+            return JsonResponse(response_data)
+        else:
+            return JsonResponse({})
 
 class CreateBudget(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
