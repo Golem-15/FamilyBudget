@@ -17,7 +17,7 @@ to imitate the behaviour of a Django + React configuration, where Django serves 
 <h3>Things that are there</h3>
 
 <ul>
-  <li>A dashboard written in Django and vanilla JS + boostrap & jQuery</li>
+  <li>A dashboard written in Django and jQuery + Bootstrap</li>
   <li>Creating + sharing budgets</li>
   <li>Investigating budget details</li>
   <li>Creating users</li>
