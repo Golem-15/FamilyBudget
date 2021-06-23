@@ -15,7 +15,7 @@ User = get_user_model()
 
 
 class AppTests(TestCase):
-    fixtures = ["budget_api_fixture.json"]
+    fixtures = ["test_fixture.json"]
 
     def setUp(self):
         self.username_1 = fake.user_name()
