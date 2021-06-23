@@ -7,7 +7,7 @@ An app for managing the family budget
 <ol style="bullet-style: none;">
   <li>Git clone</li>
   <li>Run "pip install -r requirements.txt" (preferably in a virtual env)</li>
-  <li>Run a file called "run_locally.bat"</li>
+  <li>Run a file called "run_locally.bat" (if on windows)</li>
   <li>Log in as "FamilySpirit" with the password "123"</li>
   <li>Optionall log in as other family members to see some budgets, their passwords are always "123"</li>
 </ol>
@@ -17,7 +17,7 @@ to imitate the behaviour of a Django + React configuration, where Django serves 
 <h3>Things that are there</h3>
 
 <ul>
-  <li>A dashboard written in Django and vanilla JS + boostrap & jQuery</li>
+  <li>A dashboard written in Django and jQuery + Bootstrap</li>
   <li>Creating + sharing budgets</li>
   <li>Investigating budget details</li>
   <li>Creating users</li>
@@ -25,7 +25,7 @@ to imitate the behaviour of a Django + React configuration, where Django serves 
 </ul>
 <br>
 <h3>Things that are not there or could be improved</h3>
-<p>Due to time constraints I was not able to implement all features, that I intended to.</p>
+<p>Due to time constraints (all of this took no more than 48h) I was not able to implement all features, that I intended to.</p>
 <ul>
   <li>Updating / editing budgets is not possible yet</li>
   <li>Testing is very limited (only main functionalities)</li>
