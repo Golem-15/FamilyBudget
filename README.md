@@ -25,7 +25,7 @@ to imitate the behaviour of a Django + React configuration, where Django serves 
 </ul>
 <br>
 <h3>Things that are not there or could be improved</h3>
-<p>Due to time constraints I was not able to implement all features, that I intended to.</p>
+<p>Due to time constraints (all of this took no more than 48h) I was not able to implement all features, that I intended to.</p>
 <ul>
   <li>Updating / editing budgets is not possible yet</li>
   <li>Testing is very limited (only main functionalities)</li>
