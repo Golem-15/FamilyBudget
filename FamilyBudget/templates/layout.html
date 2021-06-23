@@ -6,11 +6,9 @@
 <html>
     <head>
         <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
-        <script src="{% static 'js/popper.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
         <link rel="stylesheet" type="text/css" href="{% static 'css/datatables.min.css' %}"/>
         <script type="text/javascript" src="{% static 'js/datatables.min.js' %}"></script>
-        <script src="{% static 'js/feather.min.js' %}"></script>
         <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet">
         <link href="{% static 'css/dashboard.css' %}" type="text/css" rel="stylesheet">
         <link rel="icon" href="{% static 'images/favicon.ico' %}">
@@ -37,6 +35,9 @@
         <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
             <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{% url 'homepage' %}">FamilyBudget</a>
             <ul class="navbar-nav px-3 flex-row">
+                <li class="nav-item text-nowrap navbar-controls">
+                    <a class="nav-link" href="#">Logged in as: {{ user }}</a>
+                </li>
                 <li class="nav-item text-nowrap navbar-controls">
                     <a class="nav-link" href="{% url 'my-account' %}">User Account</a>
                 </li>
