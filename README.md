@@ -29,6 +29,5 @@ to imitate the behaviour of a Django + React configuration, where Django serves 
 <ul>
   <li>Updating / editing budgets is not possible yet</li>
   <li>Testing is very limited (only main functionalities)</li>
-  <li>Django fails to serve static files via docker-compose</li>
   <li>Pagination and filtering is done on the client's side, which should not be a problem for a simple app like this, with a limited number of results, however it chould be moved to the backend for a performance boost if needed</li>
 </ul>
