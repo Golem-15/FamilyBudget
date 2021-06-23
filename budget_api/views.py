@@ -150,6 +150,21 @@ class RenderBudgetDetails(View):
         else:
             raise Http404()
 
+class RenderBudgetEdit(View):
+    def get(self, request, pk, *args, **kwargs):
+        budget = models.Budget.objects.filter(id=pk).filter(Q(owner=request.user) | Q(shared_with__in=[request.user]))
+
+        if budget:
+            incomes = serializers.IncomeAndExpenseSerializer(models.Income.objects.filter(budget__id=self.kwargs.get('pk')), many=True).data
+            expenses = serializers.IncomeAndExpenseSerializer(models.Expense.objects.filter(budget__id=self.kwargs.get('pk')), many=True).data
+            incomes = [{key:value if key != 'value' else float(value) for key,value in income.items()} for income in incomes]
+            expenses = [{key:value if key != 'value' else -float(value) for key,value in expense.items()} for expense in expenses]
+            shared_with = serializers.BudgetSerializer(budget, many=True).data[0]['shared_with']
+            return render(request, 'budget_edit.html', context={'incomes': json.dumps(incomes), 'expenses': json.dumps(expenses), 'balance': budget[0].balance, 'shared_with': json.dumps(shared_with), 'name': budget[0].name})
+        else:
+            raise Http404()
+
+
 @transaction.atomic
 def CreateBudget(request):
     data = json.loads(request.body)
@@ -163,8 +178,5 @@ def CreateBudget(request):
         new_budget.expenses.add(new_expense)
     for user in data['sharedWith']:
         new_budget.shared_with.add(user)
-    # models.Budget.objects.create(name=data['budgetName'])    
-    # for expense in data['incomes']:
-    #     models.Income.objects.create(title=income['title'], value=income['value'], category=income['category'])
-    one = 1
+
     return HttpResponse('Budget created successfully', status=201)
