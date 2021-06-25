@@ -1,12 +1,14 @@
 from django.http.response import HttpResponse, JsonResponse, Http404
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.views.generic.list import ListView
 from django.views import View
 from django.db.models import Q
 from django.db import transaction
 from django.shortcuts import render
-from rest_framework import generics
-from rest_framework import permissions
-from rest_framework.views import APIView
+from rest_framework import generics, status, permissions
+from rest_framework.views import APIView, Response
+from rest_framework.generics import CreateAPIView, DestroyAPIView, UpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.fields import CurrentUserDefault
 import json
@@ -45,14 +47,6 @@ class CreateBudget(generics.CreateAPIView):
     def perform_create(self, serializer):
         balance = sum(float(x.value) for x in serializer.validated_data['incomes']) - sum(float(x.value) for x in serializer.validated_data['expenses'])
         serializer.save(owner=self.request.user, balance=balance)
-    
-class UpdateBudget(generics.UpdateAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.BudgetSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return models.Budget.objects.filter(owner=user)
 
 class DeleteBudget(generics.DestroyAPIView):
     permission_classes = (IsAuthenticated,)
@@ -146,7 +140,7 @@ class RenderBudgetDetails(View):
             expenses = serializers.IncomeAndExpenseSerializer(models.Expense.objects.filter(budget__id=self.kwargs.get('pk')), many=True).data
             incomes = [{key:value if key != 'value' else float(value) for key,value in income.items()} for income in incomes]
             expenses = [{key:value if key != 'value' else -float(value) for key,value in expense.items()} for expense in expenses]
-            return render(request, 'budget_details.html', context={'incomes': json.dumps(incomes), 'expenses': json.dumps(expenses)})
+            return render(request, 'budget_details.html', context={'incomes': json.dumps(incomes), 'expenses': json.dumps(expenses), 'name': budget[0].name, 'balance': budget[0].balance, 'pk': pk})
         else:
             raise Http404()
 
@@ -160,10 +154,9 @@ class RenderBudgetEdit(View):
             incomes = [{key:value if key != 'value' else float(value) for key,value in income.items()} for income in incomes]
             expenses = [{key:value if key != 'value' else -float(value) for key,value in expense.items()} for expense in expenses]
             shared_with = serializers.BudgetSerializer(budget, many=True).data[0]['shared_with']
-            return render(request, 'budget_edit.html', context={'incomes': json.dumps(incomes), 'expenses': json.dumps(expenses), 'balance': budget[0].balance, 'shared_with': json.dumps(shared_with), 'name': budget[0].name})
+            return render(request, 'budget_edit.html', context={'incomes': json.dumps(incomes), 'expenses': json.dumps(expenses), 'balance': budget[0].balance, 'shared_with': json.dumps(shared_with), 'pk': pk, 'name': budget[0].name})
         else:
             raise Http404()
-
 
 @transaction.atomic
 def CreateBudget(request):
@@ -180,3 +173,8 @@ def CreateBudget(request):
         new_budget.shared_with.add(user)
 
     return HttpResponse('Budget created successfully', status=201)
+
+class RestCreateBudgetView(CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = models.Budget.objects.all()
+    serializer_class = serializers.CreateBudgetSerializer

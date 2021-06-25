@@ -1,0 +1,347 @@
+{% extends 'layout.html' %}
+{% block content %}
+{% csrf_token %}
+    <style>        
+        .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        padding-top: 100px; 
+        left: 0;
+        top: 0;
+        width: 100%; 
+        height: 100%; 
+        overflow: auto; 
+        background-color: rgb(0,0,0); 
+        background-color: rgba(0,0,0,0.4); 
+        }
+        
+        
+        .modal-content {
+        position: relative;
+        background-color: #fefefe;
+        margin: auto;
+        padding: 0;
+        border: 1px solid #888;
+        width: 60%;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+        -webkit-animation-name: animatetop;
+        -webkit-animation-duration: 0.4s;
+        animation-name: animatetop;
+        animation-duration: 0.4s
+        }
+        
+        
+        @-webkit-keyframes animatetop {
+        from {top:-300px; opacity:0} 
+        to {top:0; opacity:1}
+        }
+        
+        @keyframes animatetop {
+        from {top:-300px; opacity:0}
+        to {top:0; opacity:1}
+        }
+        
+        
+        .close {
+        color: white;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        }
+        
+        .close:hover,
+        .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+        }
+        
+        .modal-header {
+        padding: 2px 16px;
+        background-color: #343a40;
+        color: white;
+        }
+        
+        .modal-body {padding: 2px 16px;}
+        
+        .modal-footer {
+        padding: 2px 16px;
+        background-color: #343a40;
+        color: white;
+        }
+        
+        .remove-list-item {
+            float: right;
+            cursor: pointer;
+            transition: all .2s ease-in-out;
+            margin: 0 .5rem;
+            padding: 0.3rem 0 0 0;
+        }
+        .remove-list-item:hover {
+            transform: scale(1.2);
+        }
+
+        .remove-row-icon {
+            float: left;
+            margin-right: 2rem;
+            transition: transform .5s;
+            transition-timing-function: ease-in-out;
+            cursor: pointer;
+        }
+        .remove-row-icon:hover {
+            transform: scale(1.6);
+        }
+    </style>
+    <div id="incomeAndExpenseModal" class="modal">
+
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="close">&times;</span>
+          </div>
+          <div class="modal-body">
+            <form id="modalForm" style="width: 60%; margin: auto; margin-bottom: 4vh;" onsubmit="return false">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input required name="modalTitle" id="modalTitle" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Value</label>
+                    <input required name="modalValue" id="modalValue" min=1 max=10000 type="number" class="form-control">
+                </div>
+                <select name="categorySelect" required id="categorySelect" class="form-control" style="width: 40%; display: inline-block;">
+                    <option value="" selected>Choose category</option>
+                </select>
+                <button class="btn btn-secondary float-right" id="modalSubmitButton" style="width: 40%; display: inline-block;">Add</button>  
+            </form>  
+          </div>
+          <div class="modal-footer">
+          </div>
+        </div>
+      
+    </div>
+    <h4>Edit Budget</h4>
+    <form onsubmit="return false">
+        <div class="form-group">                            
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label>Name</label>
+                <input type="text" required class="form-control" id="budgetName" style="width: 40%;" placeholder="Type in budget name...">
+                <div class="form-group choice-event-items">
+                    <label>Incomes</label>
+                    <div class="list-group-border">
+                        <ul required id="budgetIncomes" class="list-group">
+                        </ul>    
+                    </div>
+                    <div>
+                        <button type="button" id="addOptionButton" data="budgetIncomes" class="btn btn-secondary modal-button">Add income</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label>Balance</label>
+                <input type="number" disabled class="form-control" id="budgetBalance" style="width: 40%;" value=0>
+                <div class="form-group choice-event-items">
+                    <label>Expenses</label>
+                    <div class="list-group-border">
+                        <ul required id="budgetExpenses" class="list-group">
+                        </ul>    
+                    </div>
+                    <div>
+                        <button type="button" id="addOptionButton" data="budgetExpenses" class="btn btn-secondary modal-button">Add expense</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <label>Share budget with...</label>
+        <select class="custom-select" id="shareBudgetWith" multiple style="width:40%;"></select>
+        <button class="btn btn-success float-right mr-5" id="submitBudget" type="submit">Update Budget</button>
+    </form>
+    <script>
+
+    let modal = document.getElementById("incomeAndExpenseModal");
+    let btn = document.getElementById("myBtn");
+    let span = document.getElementsByClassName("close")[0];
+    let modalForm = document.getElementById('modalForm');
+        
+    document.querySelectorAll('.modal-button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            $('#modalSubmitButton')[0].setAttribute('data', e.target.getAttribute('data'))
+            modal.style.display = "block";
+        })
+    })
+        
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+        
+    window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+        }
+    }
+    </script>
+    <script>
+        function addIncomeOrExpenseElement(dataObject, listId) {
+            
+                let id = dataObject.id;
+                let title = dataObject.title;
+                let value = dataObject.value;
+                let category = dataObject.category;
+                let li = document.createElement('li');
+                li.setAttribute('post-data', JSON.stringify({'id':id, 'title': title, 'value': value, 'category': category}))
+                li.setAttribute('data', listId);
+                let titleEl = document.createElement('span');
+                let valueEl = document.createElement('span');
+                let trashIcon = document.createElement('i');
+                $('#budgetBalance')[0].value = Number($('#budgetBalance')[0].value) + Number(value);
+                li.classList.add('list-group-item');
+                trashIcon.className = "remove-row-icon";
+                trashIcon.innerHTML = '&times;';
+                trashIcon.addEventListener('click', (e) => {
+                    e.target.parentElement.remove();
+                    let removedValue = JSON.parse(e.target.parentElement.getAttribute('post-data')).value;
+                    $('#budgetBalance')[0].value = Number($('#budgetBalance')[0].value) + Number(removedValue);    
+                    
+                })
+                valueEl.classList.add('float-right');
+                titleEl.innerHTML = title;
+                valueEl.innerHTML = value;
+                li.appendChild(trashIcon);
+                li.appendChild(titleEl);
+                li.appendChild(valueEl);
+                document.getElementById(listId).appendChild(li);
+        }
+
+        function populateAllFields() {
+            let incomes = {{ incomes | safe }};
+            let expenses = {{ expenses | safe }};
+            let name = "{{ name | safe }}";
+            let balance = {{ balance | safe }};
+            let shared_with = {{ shared_with | safe }};
+            
+            $('#budgetName')[0].value = name;
+            
+            incomes.forEach(income => {
+                addIncomeOrExpenseElement(income, 'budgetIncomes')
+            })
+            
+            expenses.forEach(expense => {
+                addIncomeOrExpenseElement(expense, 'budgetExpenses')
+            })
+
+            shared_with.forEach(user => {
+                $(`#shareBudgetWith option[value=${user.id}]`)[0].selected = true
+            })
+        
+        }
+        
+    </script>
+    <script>
+        async function getIncomeAndExpenseCategories() {
+            fetch('{% url "income-and-expense-categories" %}')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(category => {
+                    let option = document.createElement('option')
+                    option.innerHTML = category.name;
+                    option.setAttribute('value', category.id)
+                    $('#categorySelect')[0].add(option);
+                })
+                populateAllFields();
+            });
+        }
+    </script>
+    <script>
+        fetch('{% url "get-user-list" %}')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(user => {
+                let option = document.createElement('option')
+                option.innerHTML = user.username;
+                option.setAttribute('value', user.id)
+                $('#shareBudgetWith')[0].add(option);
+
+            })
+        })
+            
+    </script>
+    <script>
+        $('document').ready(getIncomeAndExpenseCategories)
+    </script>
+    <script>
+        $('#modalSubmitButton')[0].addEventListener('click', e => {
+            if ($('#modalValue')[0].checkValidity() && $('#modalTitle')[0].checkValidity() && $('#categorySelect')[0].checkValidity()) {
+                let title = $('#modalTitle')[0].value;
+                let value = $('#modalValue')[0].value;
+                let category = $('#categorySelect')[0].value;
+                let listId = e.target.getAttribute('data');
+                let li = document.createElement('li');
+                li.setAttribute('post-data', JSON.stringify({'title': title, 'value': value, 'category': category}))
+                li.setAttribute('data', listId);
+                let titleEl = document.createElement('span');
+                let valueEl = document.createElement('span');
+                let trashIcon = document.createElement('i');
+                if (listId == 'budgetIncomes') {
+                    $('#budgetBalance')[0].value = Number($('#budgetBalance')[0].value) + Number(value);
+                } else {
+                    $('#budgetBalance')[0].value = Number($('#budgetBalance')[0].value) - Number(value);
+                }
+                li.classList.add('list-group-item');
+                trashIcon.className = "remove-row-icon";
+                trashIcon.innerHTML = '&times;';
+                trashIcon.addEventListener('click', (e) => {
+                    e.target.parentElement.remove();
+                    let removedValue = JSON.parse(e.target.parentElement.getAttribute('post-data')).value;
+                    if (e.target.parentElement.getAttribute('data') == 'budgetIncomes') {
+                        $('#budgetBalance')[0].value = Number($('#budgetBalance')[0].value) - Number(removedValue);    
+                    } else {
+                        $('#budgetBalance')[0].value = Number($('#budgetBalance')[0].value) + Number(removedValue);
+                    }
+                })
+                valueEl.classList.add('float-right');
+                titleEl.innerHTML = title;
+                valueEl.innerHTML = value;
+                li.appendChild(trashIcon);
+                li.appendChild(titleEl);
+                li.appendChild(valueEl);
+                document.getElementById(listId).appendChild(li);
+                modal.style.display = "none";
+                modalForm.reset();
+                }
+            })
+    </script>
+    <script>
+        async function update_budget(post_data) {
+
+                let reponse = await fetch("{% url 'budget-update' pk=pk %}", {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRFToken': $('input[name=csrfmiddlewaretoken]')[0].value},
+                    body: JSON.stringify(post_data)
+                }).then(await function(response) {
+                    if (response.ok) {
+                            alert('Budget uploaded successfully')
+                            window.location.href = "{% url 'render-budget-list' %}"
+                        } else {
+                        alert('Error when uploading budget')
+                    }}
+                )
+
+            }
+
+
+        $('#submitBudget')[0].addEventListener('click', () => {
+            if ($('#budgetName')[0].checkValidity()) {
+                let sharedWith = Array.from($('#shareBudgetWith')[0].querySelectorAll('option:checked')).map(x => Number(x.value))
+                let incomes = Array.from($('#budgetIncomes')[0].querySelectorAll('li')).map(x => JSON.parse(x.getAttribute('post-data')))
+                let expenses = Array.from($('#budgetExpenses')[0].querySelectorAll('li')).map(x => JSON.parse(x.getAttribute('post-data')))
+                let budgetName = $('#budgetName')[0].value
+                post_data = {'sharedWith': sharedWith, 'incomes': incomes, 'expenses': expenses, 'name': budgetName}
+                update_budget(post_data)
+            }
+        })
+    </script>
+
+{% endblock %}

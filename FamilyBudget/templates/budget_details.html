@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <h4>Budget Details</h4>
+    <h4 style="display: inline;">Budget details</h4><button style="display: inline-block; font-size: .75rem; margin: 0 4vw;" class="btn btn-secondary" onclick="window.location.href='{% url 'render-budget-edit' pk=pk %}'">Edit budget</button>
     <div class="form-group">
         <label>Budget name</label>
-        <input disabled class="form-group">
+        <input disabled id="budgetName" class="form-group">
     </div>
     <table id="incomeAndExpenseTable" class="display" style="width:100%">
         <thead>
@@ -57,10 +57,12 @@
 
         const incomes = {{ incomes | safe }}
         const expenses = {{ expenses | safe }}
+        const name = "{{ name | safe }}"
         data = incomes.concat(expenses)
         data = data.map(x => x)
         let parsed_data = data.map(x => Object.values(x))
         createTable(parsed_data)
+        $('#budgetName')[0].value = name;
 
         // define keyups for instant filtering
         // $('#minDelay, #maxDelay, #minChance, #maxChance').keyup( function() {
